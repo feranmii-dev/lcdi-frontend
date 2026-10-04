@@ -60,39 +60,51 @@ export function ErrorState({ message }: { message: string }) {
 export function ResultState({ data }: { data: PredictionResult }) {
   const isGlaucoma = data.prediction === "Glaucoma";
   const main = isGlaucoma ? "#B5531E" : "#2F7A55";
-
   const pct = Math.round(data.probability * 100);
   const animatedPct = useCountUp(pct);
 
-  const ARC = 339;
-  const offset = ARC * (1 - data.probability);
+  // Gauge settings (same approach as your GaugeChart)
+  const size = 220;
+  const strokeWidth = 14;
+  const center = size / 2;
+  const radius = center - strokeWidth;
+  const circumference = Math.PI * radius; // half-circle
+  const strokeDashoffset = circumference - (data.probability) * circumference;
 
   return (
     <>
       <PanelHeader color={main} />
-
       <div className="flex flex-col items-center pt-1.5 pb-0.5">
-        <div className="relative w-full max-w-57.5 aspect-230/135">
-          <svg viewBox="0 0 230 135" className="w-full h-full">
+        <div
+          className="relative flex flex-col items-center justify-center"
+          style={{ width: size, height: size / 2 + 40 }}
+        >
+          <svg
+            width={size}
+            height={size / 2 + 10}
+            className="overflow-visible"
+          >
             <path
-              d="M20 120 A 95 95 0 0 1 210 120"
+              d={`M ${strokeWidth} ${center} A ${radius} ${radius} 0 0 1 ${size - strokeWidth} ${center}`}
               fill="none"
               stroke="#E7ECED"
-              strokeWidth="14"
+              strokeWidth={strokeWidth}
               strokeLinecap="round"
             />
             <path
-              d="M20 120 A 95 95 0 0 1 210 120"
+              d={`M ${strokeWidth} ${center} A ${radius} ${radius} 0 0 1 ${size - strokeWidth} ${center}`}
               fill="none"
               stroke={main}
-              strokeWidth="14"
+              strokeWidth={strokeWidth}
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
-              strokeDasharray={ARC}
-              strokeDashoffset={offset}
               style={{ transition: "stroke-dashoffset 1s ease-out" }}
             />
           </svg>
-          <div className="absolute left-0 right-0 top-[42%] text-center">
+
+          {/* Percentage in the center */}
+          <div className="absolute bottom-0 left-0 right-0 text-center">
             <div className="font-mono text-[40px] font-semibold text-[#152229] leading-none tracking-[-0.02em]">
               {Math.round(animatedPct)}
               <span className="text-[18px] text-[#5C6B72] font-medium">%</span>

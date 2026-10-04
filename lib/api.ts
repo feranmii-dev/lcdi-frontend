@@ -1,4 +1,6 @@
-const BASE = "https://lcdi-glaucoma-api.onrender.com";
+const BASE = process.env.NEXT_PUBLIC_BASEURL;
+
+
 
 export const FIELDS = [
   { key: "age",     label: "Age",                       unit: "years", group: "Patient",   placeholder: "63" },
